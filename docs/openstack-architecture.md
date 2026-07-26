@@ -1,6 +1,6 @@
 # OpenStack arhitektura
 
-![OpenStack arhitektura](slike/os-arhitektura.png)
+![OpenStack arhitektura](images/openstack-architecture.png)
 
 Mermaid izvor (GitHub ga renderira):
 

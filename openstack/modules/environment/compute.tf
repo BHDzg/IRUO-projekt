@@ -16,7 +16,7 @@ resource "openstack_compute_instance_v2" "moodle" {
 
   metadata = merge(local.meta, { node = each.key })
 
-  user_data = templatefile("${path.module}/predlosci/moodle.yaml.tftpl", {
+  user_data = templatefile("${path.module}/templates/moodle.yaml.tftpl", {
     ime_racunala   = "${var.vlasnik}-moodle-${each.key}"
     podatkovni_dev = "/dev/vdb"
     nfs_izvoz      = try(openstack_sharedfilesystem_share_v2.sigkopije.export_locations[0].path, "")

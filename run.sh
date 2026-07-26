@@ -3,17 +3,17 @@
 #  TechSprint / ts-moodle-lab — jedina ulazna skripta projekta (pokrece se JEDNOM)
 #
 #  Skripta prima putanju do CSV datoteke (ime;prezime;rola), pretvara je u
-#  korisnici.auto.tfvars.json te Terraformom podize kompletnu infrastrukturu
+#  users.auto.tfvars.json te Terraformom podize kompletnu infrastrukturu
 #  za varijabilan broj korisnika u OpenStack i/ili Azure oblaku.
 #
 #  Koristenje:
-#    ./pokreni.sh [-c openstack|azure|oba] [-a provjera|plan|primjena|rusenje] <putanja/do.csv>
+#    ./run.sh [-c openstack|azure|oba] [-a provjera|plan|primjena|rusenje] <putanja/do.csv>
 #
 #  Primjeri:
-#    ./pokreni.sh podaci/tim.csv                       # provjera (validate) za oba oblaka
-#    ./pokreni.sh -c openstack -a primjena podaci/tim.csv
-#    ./pokreni.sh -c azure -a plan podaci/tim.csv
-#    ./pokreni.sh -c oba -a rusenje podaci/tim.csv
+#    ./run.sh data/team.csv                       # provjera (validate) za oba oblaka
+#    ./run.sh -c openstack -a primjena data/team.csv
+#    ./run.sh -c azure -a plan data/team.csv
+#    ./run.sh -c oba -a rusenje data/team.csv
 # =============================================================================
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
@@ -29,18 +29,18 @@ while getopts ":c:a:h" opt; do
     c) OBLAK="$OPTARG" ;;
     a) AKCIJA="$OPTARG" ;;
     h) sed -n '2,17p' "$0"; exit 0 ;;
-    \?) greska "Nepoznata opcija: -$OPTARG (pomoc: ./pokreni.sh -h)" ;;
+    \?) greska "Nepoznata opcija: -$OPTARG (pomoc: ./run.sh -h)" ;;
     :)  greska "Opcija -$OPTARG zahtijeva vrijednost" ;;
   esac
 done
 shift $((OPTIND - 1))
 
 CSV="${1:-}"
-[ -n "$CSV" ] || greska "Nedostaje putanja do CSV-a. Primjer: ./pokreni.sh podaci/tim.csv"
+[ -n "$CSV" ] || greska "Nedostaje putanja do CSV-a. Primjer: ./run.sh data/team.csv"
 [ -f "$CSV" ] || greska "CSV ne postoji: $CSV"
 
 # -----------------------------------------------------------------------------
-# 1) CSV -> JSON (korisnici.auto.tfvars.json) uz validaciju sadrzaja
+# 1) CSV -> JSON (users.auto.tfvars.json) uz validaciju sadrzaja
 #    - zaglavlje mora biti: ime;prezime;rola
 #    - role: developer | devops_lead
 #    - tocno jedan devops_lead, barem jedan developer
@@ -66,9 +66,9 @@ JSON="$(awk -F';' '
     if (lead != 1) { printf "LEAD:%d", lead > "/dev/stderr"; exit 5 }
     if (dev  < 1)  { printf "DEV:%d",  dev  > "/dev/stderr"; exit 6 }
     printf "{\"korisnici\":[%s]}", lista
-  }' "$CSV" 2>/tmp/pokreni-csv-err)" || {
+  }' "$CSV" 2>/tmp/run-csv-err)" || {
     kod=$?
-    razlog="$(cat /tmp/pokreni-csv-err 2>/dev/null || true)"
+    razlog="$(cat /tmp/run-csv-err 2>/dev/null || true)"
     case "$kod" in
       2) greska "Neispravno CSV zaglavlje (${razlog#HDR:}) — ocekivano: ime;prezime;rola" ;;
       3) greska "Nepotpun redak br. ${razlog#ROW:} u CSV-u" ;;
@@ -94,8 +94,8 @@ esac
 command -v terraform >/dev/null || greska "Terraform nije instaliran"
 
 for dir in "${OKOLINE[@]}"; do
-  printf '%s\n' "$JSON" > "$dir/korisnici.auto.tfvars.json"
-  ispis "[$dir] zapisan korisnici.auto.tfvars.json"
+  printf '%s\n' "$JSON" > "$dir/users.auto.tfvars.json"
+  ispis "[$dir] zapisan users.auto.tfvars.json"
 
   ispis "[$dir] terraform init"
   terraform -chdir="$dir" init -input=false >/dev/null

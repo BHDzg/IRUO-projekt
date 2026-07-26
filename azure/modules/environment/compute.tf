@@ -33,7 +33,7 @@ resource "azurerm_linux_virtual_machine" "moodle" {
   network_interface_ids = [azurerm_network_interface.moodle[each.key].id]
   tags                  = merge(local.meta, { node = each.key })
 
-  custom_data = base64encode(templatefile("${path.module}/predlosci/moodle.yaml.tftpl", {
+  custom_data = base64encode(templatefile("${path.module}/templates/moodle.yaml.tftpl", {
     ime_racunala = "${var.vlasnik}-moodle-${each.key}"
     racun        = azurerm_storage_account.pohrana.name
     kljuc_racuna = azurerm_storage_account.pohrana.primary_access_key

@@ -2,9 +2,9 @@
 
 ## OpenStack (Keystone)
 
-![OpenStack IAM](slike/os-iam.png)
+![OpenStack IAM](images/openstack-iam.png)
 
-* CSV (`tim.csv`) → `pokreni.sh` pretvara u JSON → Terraform `for_each` kreira
+* CSV (`team.csv`) → `run.sh` pretvara u JSON → Terraform `for_each` kreira
   Keystone racune, skupine (`programeri`, `voditelji`) i tenant po programeru.
 * **Programer** = rola `member` iskljucivo na svom tenantu → vidi i upravlja samo
   svojim resursima, ukljucujuci start/stop/reboot vlastitih instanci.
@@ -14,7 +14,7 @@
 
 ## Azure (Entra ID + RBAC)
 
-![Azure RBAC](slike/az-rbac.png)
+![Azure RBAC](images/azure-rbac.png)
 
 * Iz CSV-a nastaju Entra racuni (`fnovak@...`, uz obveznu promjenu lozinke) i
   sigurnosne skupine `tslab-t-skupina-programeri` / `tslab-t-skupina-voditelji`.

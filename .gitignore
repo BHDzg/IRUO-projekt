@@ -5,12 +5,12 @@
 crash.log
 .terraform.lock.hcl
 
-# Generirano skriptom pokreni.sh
+# Generirano skriptom run.sh
 *.auto.tfvars.json
 
 # Lokalne varijable i tajne
 *.tfvars
-!*.tfvars.primjer
+!*.tfvars.example
 *.pem
 id_*
 !id_*.pub

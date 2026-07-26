@@ -2,9 +2,9 @@
 # Ulazne varijable — Azure okolina
 # =============================================================================
 
-# Korisnici stizu iz korisnici.auto.tfvars.json kojeg generira pokreni.sh
+# Korisnici stizu iz users.auto.tfvars.json kojeg generira run.sh
 variable "korisnici" {
-  description = "Popis korisnika iz CSV-a (generira pokreni.sh)"
+  description = "Popis korisnika iz CSV-a (generira run.sh)"
   type = list(object({
     ime     = string
     prezime = string

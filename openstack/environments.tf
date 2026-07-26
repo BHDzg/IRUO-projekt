@@ -1,7 +1,7 @@
 # Po jedna potpuno izolirana okolina za svakog programera iz CSV-a.
 # Broj okolina ovisi iskljucivo o broju redaka u CSV datoteci.
 module "okolina" {
-  source   = "./moduli/okolina"
+  source   = "./modules/environment"
   for_each = local.programeri
 
   vlasnik   = each.key

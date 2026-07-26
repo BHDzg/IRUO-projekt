@@ -3,7 +3,7 @@
 Automatizirano kreiranje sigurnih, medjusobno izoliranih testnih okolina za
 programere agencije TechSprint, realizirano **Terraformom** na **dva oblaka**:
 OpenStack i Microsoft Azure. Izvor istine je CSV datoteka s korisnicima —
-skripta `pokreni.sh` pretvara je u JSON i predaje Terraformu, pa broj okolina
+skripta `run.sh` pretvara je u JSON i predaje Terraformu, pa broj okolina
 ovisi iskljucivo o broju redaka u CSV-u.
 
 ## Sto dobiva svaki programer
@@ -26,19 +26,19 @@ kontrolu nad svima.
 
 ```
 .
-├── pokreni.sh                  # JEDINA ulazna skripta (CSV → JSON → Terraform)
-├── podaci/tim.csv              # ulaz: ime;prezime;rola
+├── run.sh                  # JEDINA ulazna skripta (CSV → JSON → Terraform)
+├── data/team.csv              # ulaz: ime;prezime;rola
 ├── openstack/                  # Terraform za OpenStack
 │   ├── iam.tf                  #   Keystone tenanti/racuni/skupine/role
-│   ├── pristup.tf              #   pristupnik + racunalo voditelja
-│   ├── okoline.tf              #   for_each ⇒ moduli/okolina po programeru
-│   └── moduli/okolina/         #   mreza, sigurnost, pohrana, racunala, balanser
+│   ├── access.tf              #   pristupnik + racunalo voditelja
+│   ├── environments.tf              #   for_each ⇒ modules/environment po programeru
+│   └── modules/environment/         #   mreza, sigurnost, pohrana, racunala, balanser
 ├── azure/                      # Terraform za Azure (hub-and-spoke)
 │   ├── iam.tf                  #   Entra ID + custom RBAC rola
-│   ├── sredisnjica.tf          #   hub VNet, pristupnik, voditelj, peering
-│   ├── okoline.tf              #   for_each ⇒ moduli/okolina po programeru
-│   └── moduli/okolina/         #   spoke VNet, NSG/ASG, pohrana, VM-ovi, balanser
-└── dokumentacija/              # dijagrami, troskovi, usporedbe, konvencije
+│   ├── hub.tf          #   hub VNet, pristupnik, voditelj, peering
+│   ├── environments.tf              #   for_each ⇒ modules/environment po programeru
+│   └── modules/environment/         #   spoke VNet, NSG/ASG, pohrana, VM-ovi, balanser
+└── docs/              # dijagrami, troskovi, usporedbe, konvencije
 ```
 
 ## Pokretanje
@@ -53,11 +53,11 @@ az vm image terms accept --publisher resf --offer rockylinux-x86_64 --plan 9-bas
 Skripta se pokrece **jednom**, s putanjom do CSV-a:
 
 ```bash
-./pokreni.sh podaci/tim.csv                          # provjera (validate), oba oblaka
-./pokreni.sh -c openstack -a primjena podaci/tim.csv # deploy OpenStack
-./pokreni.sh -c azure     -a primjena podaci/tim.csv # deploy Azure
-./pokreni.sh -c oba       -a plan     podaci/tim.csv # plan za oba
-./pokreni.sh -c oba       -a rusenje  podaci/tim.csv # rusenje svega
+./run.sh data/team.csv                          # provjera (validate), oba oblaka
+./run.sh -c openstack -a primjena data/team.csv # deploy OpenStack
+./run.sh -c azure     -a primjena data/team.csv # deploy Azure
+./run.sh -c oba       -a plan     data/team.csv # plan za oba
+./run.sh -c oba       -a rusenje  data/team.csv # rusenje svega
 ```
 
 CSV format (tocno jedan `devops_lead`, proizvoljno developera):
@@ -83,10 +83,10 @@ Adrese i sazetak okolina: `terraform output`; pocetne lozinke racuna:
 
 | Datoteka | Sadrzaj |
 |---|---|
-| [dokumentacija/imenovanje-i-oznake.md](dokumentacija/imenovanje-i-oznake.md) | konvencija imenovanja + tagovi |
-| [dokumentacija/arhitektura-openstack.md](dokumentacija/arhitektura-openstack.md) | OpenStack dijagram i odluke |
-| [dokumentacija/arhitektura-azure.md](dokumentacija/arhitektura-azure.md) | Azure dijagram i odluke |
-| [dokumentacija/iam-modeli.md](dokumentacija/iam-modeli.md) | Keystone IAM + Azure RBAC dijagrami |
-| [dokumentacija/troskovi-azure.md](dokumentacija/troskovi-azure.md) | mjesecna procjena troskova |
-| [dokumentacija/usporedba-elemenata.md](dokumentacija/usporedba-elemenata.md) | usporedba Azure/OpenStack + LB usporedba |
-| [dokumentacija/mrezne-postavke.md](dokumentacija/mrezne-postavke.md) | objasnjenje mreznih postavki |
+| [docs/naming-and-tags.md](docs/naming-and-tags.md) | konvencija imenovanja + tagovi |
+| [docs/openstack-architecture.md](docs/openstack-architecture.md) | OpenStack dijagram i odluke |
+| [docs/azure-architecture.md](docs/azure-architecture.md) | Azure dijagram i odluke |
+| [docs/iam-models.md](docs/iam-models.md) | Keystone IAM + Azure RBAC dijagrami |
+| [docs/azure-costs.md](docs/azure-costs.md) | mjesecna procjena troskova |
+| [docs/services-comparison.md](docs/services-comparison.md) | usporedba Azure/OpenStack + LB usporedba |
+| [docs/network-design.md](docs/network-design.md) | objasnjenje mreznih postavki |

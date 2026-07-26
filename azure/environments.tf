@@ -1,6 +1,6 @@
 # Po jedna izolirana spoke okolina za svakog programera iz CSV-a.
 module "okolina" {
-  source   = "./moduli/okolina"
+  source   = "./modules/environment"
   for_each = local.programeri
 
   vlasnik = each.key

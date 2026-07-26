@@ -1,6 +1,6 @@
 # Azure arhitektura (hub-and-spoke)
 
-![Azure arhitektura](slike/az-arhitektura.png)
+![Azure arhitektura](images/azure-architecture.png)
 
 ```mermaid
 flowchart TB

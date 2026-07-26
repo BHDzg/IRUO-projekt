@@ -89,7 +89,7 @@ resource "openstack_compute_instance_v2" "pristupnik" {
   flavor_name = var.velicina_pristupnik
   image_name  = var.slika
   key_pair    = openstack_compute_keypair_v2.lab.name
-  user_data   = file("${path.module}/cloud-init/pristupnik.yaml")
+  user_data   = file("${path.module}/cloud-init/jumphost.yaml")
   metadata    = merge(local.meta_zajednicko, { owner = "mgmt", role = "bastion" })
 
   network {
@@ -117,7 +117,7 @@ resource "openstack_compute_instance_v2" "voditelj" {
   image_name      = var.slika
   key_pair        = openstack_compute_keypair_v2.lab.name
   security_groups = [openstack_networking_secgroup_v2.voditelj.name]
-  user_data       = file("${path.module}/cloud-init/pristupnik.yaml")
+  user_data       = file("${path.module}/cloud-init/jumphost.yaml")
   metadata        = merge(local.meta_zajednicko, { owner = "mgmt", role = "devops_lead" })
 
   network {

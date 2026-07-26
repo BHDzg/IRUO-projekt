@@ -1,6 +1,6 @@
 # Autentikacija: preporuceno je prije pokretanja izvrsiti `source openrc`
 # (provider automatski cita OS_* varijable okoline); alternativno se
-# vrijednosti mogu zadati u os-lab.tfvars (vidi os-lab.tfvars.primjer).
+# vrijednosti mogu zadati u os-lab.tfvars (vidi os-lab.tfvars.example).
 provider "openstack" {
   auth_url            = var.os_auth_url != "" ? var.os_auth_url : null
   user_name           = var.os_korisnik != "" ? var.os_korisnik : null

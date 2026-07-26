@@ -133,7 +133,7 @@ resource "azurerm_linux_virtual_machine" "pristupnik" {
   size                  = var.velicina_mgmt
   admin_username        = var.admin_racun
   network_interface_ids = [azurerm_network_interface.pristupnik.id]
-  custom_data           = base64encode(file("${path.module}/cloud-init/pristupnik.yaml"))
+  custom_data           = base64encode(file("${path.module}/cloud-init/jumphost.yaml"))
   tags                  = merge(local.meta, { owner = "mgmt", role = "bastion" })
 
   admin_ssh_key {
@@ -189,7 +189,7 @@ resource "azurerm_linux_virtual_machine" "voditelj" {
   size                  = var.velicina_mgmt
   admin_username        = var.admin_racun
   network_interface_ids = [azurerm_network_interface.voditelj.id]
-  custom_data           = base64encode(file("${path.module}/cloud-init/pristupnik.yaml"))
+  custom_data           = base64encode(file("${path.module}/cloud-init/jumphost.yaml"))
   tags                  = merge(local.meta, { owner = "mgmt", role = "devops_lead" })
 
   admin_ssh_key {
