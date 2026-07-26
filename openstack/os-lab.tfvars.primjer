@@ -1,0 +1,13 @@
+# Kopirati u os-lab.tfvars (ili koristiti `source openrc`) i prilagoditi.
+os_auth_url = "http://10.0.0.5:5000/v3"
+os_korisnik = "admin"
+os_lozinka  = "promijeni-me"
+os_projekt  = "admin"
+os_regija   = "RegionOne"
+
+slika               = "rocky-9-cloud"
+velicina_moodle     = "m1.medium"   # 2 vCPU / 4 GB
+velicina_pristupnik = "m1.small"
+vanjska_mreza       = "public"
+
+javni_ssh_kljuc = "ssh-ed25519 AAAA... vas-kljuc"

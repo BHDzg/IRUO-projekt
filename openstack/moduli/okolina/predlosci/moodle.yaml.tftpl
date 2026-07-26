@@ -1,0 +1,74 @@
+#cloud-config
+# =============================================================================
+# Moodle instanca (Rocky Linux 9)
+#  1. podatkovni disk: GPT + XFS + trajni mount     -> /opt/moodle-podaci
+#  2. NFS (Manila) za sigurnosne kopije             -> /opt/sigkopije
+#  3. Apache + PHP stack za Moodle
+#  4. rclone predlozak za Swift objektnu pohranu (least-privilege: programer
+#     unosi VLASTITI Keystone application credential svog tenanta)
+# =============================================================================
+hostname: ${ime_racunala}
+
+package_update: true
+packages:
+  - httpd
+  - php
+  - php-mysqlnd
+  - php-gd
+  - php-xml
+  - php-mbstring
+  - php-intl
+  - php-json
+  - php-zip
+  - nfs-utils
+  - git
+  - unzip
+
+disk_setup:
+  ${podatkovni_dev}:
+    table_type: gpt
+    layout: true
+    overwrite: false
+
+fs_setup:
+  - device: ${podatkovni_dev}
+    partition: 1
+    filesystem: xfs
+    label: moodlepodaci
+
+mounts:
+  - [ "LABEL=moodlepodaci", /opt/moodle-podaci, xfs, "defaults,nofail", "0", "2" ]
+%{ if nfs_izvoz != "" ~}
+  - [ "${nfs_izvoz}", /opt/sigkopije, nfs, "defaults,_netdev,nofail", "0", "0" ]
+%{ endif ~}
+
+write_files:
+  # stranica za health nadzor Octavia balansera
+  - path: /var/www/html/status.html
+    content: |
+      OK
+  - path: /var/www/html/index.html
+    content: |
+      <html><body>
+        <h1>ts-moodle-lab — cvor: ${ime_racunala}</h1>
+        <p>Objektna pohrana (Swift): ${spremnik}</p>
+      </body></html>
+  - path: /etc/rclone-swift.conf
+    permissions: "0600"
+    content: |
+      [swift]
+      type = swift
+      env_auth = false
+      auth = OS_AUTH_URL
+      application_credential_id = UPISI
+      application_credential_secret = UPISI
+      # Spremnik ovog programera: ${spremnik}
+
+runcmd:
+  - mkdir -p /opt/moodle-podaci /opt/sigkopije
+  - mount -a
+  - chown -R apache:apache /opt/moodle-podaci
+  - git clone -b MOODLE_500_STABLE --depth 1 https://github.com/moodle/moodle.git /var/www/html/moodle || true
+  - chown -R apache:apache /var/www/html
+  - setsebool -P httpd_use_nfs 1 || true
+  - systemctl enable --now httpd
