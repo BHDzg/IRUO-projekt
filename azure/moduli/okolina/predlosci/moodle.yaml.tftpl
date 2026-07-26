@@ -1,0 +1,69 @@
+#cloud-config
+# =============================================================================
+# Moodle VM (Rocky Linux 9, Azure)
+#  1. podatkovni managed disk (LUN 0): GPT + XFS   -> /opt/moodle-podaci
+#  2. Azure Files (SMB) share za sigurnosne kopije -> /opt/sigkopije
+#  3. Apache + PHP stack
+#  4. blob (objektna pohrana) preko MANAGED IDENTITYJA — bez kljuceva na VM-u
+# =============================================================================
+hostname: ${ime_racunala}
+
+package_update: true
+packages:
+  - httpd
+  - php
+  - php-mysqlnd
+  - php-gd
+  - php-xml
+  - php-mbstring
+  - php-intl
+  - php-json
+  - php-zip
+  - cifs-utils
+  - git
+  - unzip
+
+disk_setup:
+  /dev/disk/azure/scsi1/lun0:
+    table_type: gpt
+    layout: true
+    overwrite: false
+
+fs_setup:
+  - device: /dev/disk/azure/scsi1/lun0
+    partition: 1
+    filesystem: xfs
+    label: moodlepodaci
+
+write_files:
+  - path: /etc/smb-sigkopije.cred
+    permissions: "0600"
+    content: |
+      username=${racun}
+      password=${kljuc_racuna}
+  - path: /var/www/html/status.html
+    content: |
+      OK
+  - path: /var/www/html/index.html
+    content: |
+      <html><body>
+        <h1>ts-moodle-lab — cvor: ${ime_racunala}</h1>
+        <p>Objektna pohrana: ${racun}/${spremnik} (managed identity)</p>
+      </body></html>
+
+mounts:
+  - [ "LABEL=moodlepodaci", /opt/moodle-podaci, xfs, "defaults,nofail", "0", "2" ]
+  - [ "//${racun}.file.core.windows.net/${share}", /opt/sigkopije, cifs,
+      "vers=3.1.1,credentials=/etc/smb-sigkopije.cred,dir_mode=0770,file_mode=0660,serverino,nofail,_netdev", "0", "0" ]
+
+runcmd:
+  - mkdir -p /opt/moodle-podaci /opt/sigkopije
+  - mount -a
+  - chown -R apache:apache /opt/moodle-podaci
+  - git clone -b MOODLE_500_STABLE --depth 1 https://github.com/moodle/moodle.git /var/www/html/moodle || true
+  - chown -R apache:apache /var/www/html
+  - setsebool -P httpd_use_cifs 1 || true
+  - systemctl enable --now httpd
+  # primjer pristupa blob pohrani managed identityjem:
+  #   azcopy login --identity
+  #   azcopy cp datoteka "https://${racun}.blob.core.windows.net/${spremnik}/"

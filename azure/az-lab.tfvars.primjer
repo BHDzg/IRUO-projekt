@@ -1,0 +1,11 @@
+# Kopirati u az-lab.tfvars i prilagoditi. Prijava: az login
+pretplata_id = "00000000-0000-0000-0000-000000000000"
+regija       = "westeurope"
+
+velicina_moodle = "Standard_B2s"   # 2 vCPU / 4 GB
+velicina_mgmt   = "Standard_B1s"
+
+javni_ssh_kljuc = "ssh-ed25519 AAAA... vas-kljuc"
+
+# Prije prvog pokretanja jednom prihvatiti uvjete Rocky slike:
+#   az vm image terms accept --publisher resf --offer rockylinux-x86_64 --plan 9-base
