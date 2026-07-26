@@ -90,4 +90,3 @@ Adrese i sazetak okolina: `terraform output`; pocetne lozinke racuna:
 | [dokumentacija/troskovi-azure.md](dokumentacija/troskovi-azure.md) | mjesecna procjena troskova |
 | [dokumentacija/usporedba-elemenata.md](dokumentacija/usporedba-elemenata.md) | usporedba Azure/OpenStack + LB usporedba |
 | [dokumentacija/mrezne-postavke.md](dokumentacija/mrezne-postavke.md) | objasnjenje mreznih postavki |
-| [dokumentacija/video-scenarij.md](dokumentacija/video-scenarij.md) | scenarij za YouTube snimku |
