@@ -1,0 +1,12 @@
+#cloud-config
+# Pristupnik / racunalo voditelja — alati, bez IP forwardinga
+package_update: true
+packages:
+  - vim
+  - tmux
+write_files:
+  - path: /etc/sysctl.d/70-bez-forwardinga.conf
+    content: |
+      net.ipv4.ip_forward = 0
+runcmd:
+  - sysctl --system
